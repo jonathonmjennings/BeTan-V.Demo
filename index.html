@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Thryv Tan — Your Perfect Tan Awaits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #E8A020;
+    --gold-light: #F5BC50;
+    --gold-dark: #C4841A;
+    --gold-dim: rgba(232,160,32,0.15);
+    --gold-glow: rgba(232,160,32,0.35);
+    --bg: #0E0D0B;
+    --bg2: #141310;
+    --bg3: #1C1A15;
+    --bg4: #242018;
+    --card: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.07);
+    --card-gold: rgba(232,160,32,0.12);
+    --text: #F5F0E8;
+    --text2: #A89880;
+    --text3: #6B5E4A;
+    --green: #4CAF7D;
+    --red: #E05050;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --radius-xs: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* PHONE SHELL */
+  .phone-shell {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 50px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 40px 120px rgba(0,0,0,0.9), 0 0 80px rgba(232,160,32,0.08);
+  }
+
+  /* Notch */
+  .notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 34px;
+    background: #000;
+    border-radius: 0 0 22px 22px;
+    z-index: 100;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 28px 8px;
+    z-index: 99;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .status-time { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; }
+  .status-icons { display: flex; gap: 5px; align-items: center; }
+  .status-icons svg { width: 16px; height: 16px; fill: var(--text); }
+
+  /* SCREENS */
+  .screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: none;
+    flex-direction: column;
+    background: var(--bg);
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active { display: flex; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; } 50% { opacity: 0.5; }
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); } to { transform: rotate(360deg); }
+  }
+  @keyframes scanLine {
+    0% { top: 10%; } 100% { top: 90%; }
+  }
+  @keyframes dashSpin {
+    to { stroke-dashoffset: -600; }
+  }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 20px var(--gold-glow); }
+    50% { box-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(232,160,32,0.2); }
+  }
+  @keyframes countDown {
+    from { stroke-dashoffset: 0; } to { stroke-dashoffset: 502; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes ripple {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  .screen.active > * {
+    animation: fadeUp 0.4s ease both;
+  }
+  .screen.active > *:nth-child(1) { animation-delay: 0.05s; }
+  .screen.active > *:nth-child(2) { animation-delay: 0.1s; }
+  .screen.active > *:nth-child(3) { animation-delay: 0.15s; }
+  .screen.active > *:nth-child(4) { animation-delay: 0.2s; }
+  .screen.active > *:nth-child(5) { animation-delay: 0.25s; }
+  .screen.active > *:nth-child(6) { animation-delay: 0.3s; }
+
+  /* ===== SPLASH ===== */
+  #splash {
+    background: radial-gradient(ellipse at 50% 30%, rgba(232,160,32,0.15) 0%, transparent 60%), var(--bg);
+    justify-content: center;
+    align-items: center;
+  }
+  .splash-content { text-align: center; padding: 40px; }
+  .splash-logo-wrap { margin-bottom: 20px; }
+  .splash-sun { font-size: 72px; display: block; animation: bounce 2s ease-in-out infinite; }
+  .splash-brand { font-family: 'Sora', sans-serif; font-size: 38px; font-weight: 800; color: var(--text); letter-spacing: -1px; margin-bottom: 8px; }
+  .splash-brand span { color: var(--gold); }
+  .splash-tagline { font-size: 15px; color: var(--text2); line-height: 1.5; margin-bottom: 50px; max-width: 260px; margin-left: auto; margin-right: auto; }
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 50px; }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: left;
+    backdrop-filter: blur(10px);
+  }
+  .feature-card-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .feature-card-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .feature-card-sub { font-size: 11px; color: var(--text3); }
+  .btn-primary {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Sora', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a0f00;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 8px 30px var(--gold-glow);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+  .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-secondary {
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s;
+  }
+  .btn-secondary:active { background: var(--card); }
+
+  /* ===== QUIZ COMMON ===== */
+  .quiz-header { padding: 60px 28px 24px; }
+  .quiz-emoji { font-size: 42px; margin-bottom: 16px; display: block; }
+  .quiz-title { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 10px; }
+  .quiz-subtitle { font-size: 14px; color: var(--text2); line-height: 1.5; }
+  .quiz-body { padding: 0 28px; flex: 1; }
+  .quiz-footer { padding: 20px 28px 40px; }
+
+  /* Progress */
+  .progress-dots { display: flex; gap: 6px; padding: 60px 28px 0; }
+  .progress-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--bg4); transition: all 0.3s; }
+  .progress-dot.done { background: var(--gold); }
+  .progress-dot.active { background: var(--gold-light); }
+
+  /* OPTION CARDS */
+  .option-list { display: flex; flex-direction: column; gap: 10px; }
+  .option-card {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--card);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-card.selected {
+    border-color: var(--gold);
+    background: var(--card-gold);
+    box-shadow: 0 0 0 1px rgba(232,160,32,0.3), 0 4px 20px rgba(232,160,32,0.15);
+  }
+  .option-card:active { transform: scale(0.99); }
+  .option-swatch {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  .option-icon { font-size: 28px; width: 44px; text-align: center; flex-shrink: 0; }
+  .option-text { flex: 1; }
+  .option-title { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .option-sub { font-size: 12px; color: var(--text3); }
+  .option-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--text3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .option-card.selected .option-check { background: var(--gold); border-color: var(--gold); }
+  .option-check::after { content: '✓'; font-size: 12px; font-weight: 700; color: #1a0f00; opacity: 0; transition: opacity 0.2s; }
+  .option-card.selected .option-check::after { opacity: 1; }
+
+  /* ===== SKIN SCANNER ===== */
+  .scanner-header { padding: 60px 28px 20px; text-align: center; }
+  .scanner-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+  .scanner-title { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+  .scanner-sub { font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .scanner-area-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+  .scanner-circle {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 28px;
+  }
+  .scanner-circle-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    border: 2px dashed rgba(232,160,32,0.4);
+    animation: spin 8s linear infinite;
+  }
+  .scanner-circle-ring.scanning {
+    border-color: var(--gold);
+    border-style: solid;
+    animation: spin 2s linear infinite;
+    box-shadow: 0 0 30px var(--gold-glow);
+  }
+  .scanner-hand { font-size: 72px; }
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    top: 40%;
+    display: none;
+    border-radius: 1px;
+    box-shadow: 0 0 10px var(--gold-glow);
+  }
+  .scan-line.active { display: block; animation: scanLine 1.5s ease-in-out infinite; }
+  .scanner-instruction { font-size: 14px; color: var(--text2); text-align: center; line-height: 1.6; }
+  .scanner-instruction em { color: var(--gold); font-style: normal; font-weight: 600; }
+  .scan-direction {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--gold);
+    margin-top: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-align: center;
+  }
+  .scan-direction.show { opacity: 1; }
+  .scanner-footer { padding: 20px 28px 44px; }
+
+  /* ===== TAN PROFILE ===== */
+  .profile-header { padding: 60px 28px 20px; text-align: center; }
+  .profile-card {
+    margin: 0 28px 20px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .profile-shade-circle {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    border: 3px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .profile-shade-name { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .profile-shade-num { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .shade-slider-track { height: 8px; background: linear-gradient(90deg, #FDDCB5, #C8874A, #5C3010); border-radius: 4px; position: relative; margin-bottom: 6px; }
+  .shade-slider-thumb { width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.6); position: absolute; top: 50%; transform: translateY(-50%); border: 2px solid var(--gold); }
+  .shade-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); }
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 28px 16px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .stat-value { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 800; color: var(--gold); margin-bottom: 4px; }
+  .stat-label { font-size: 12px; color: var(--text3); }
+  .profile-banner {
+    margin: 0 28px 24px;
+    background: rgba(76,175,125,0.12);
+    border: 1px solid rgba(76,175,125,0.3);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #6FDBA5;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .profile-banner-icon { font-size: 18px; }
+
+  /* ===== UPSELL ===== */
+  #upsell {
+    background: radial-gradient(ellipse at 50% 0%, rgba(232,160,32,0.12) 0%, transparent 50%), var(--bg);
+  }
+  .upsell-header { padding: 60px 28px 24px; text-align: center; }
+  .upsell-crown { font-size: 52px; margin-bottom: 16px; display: block; animation: bounce 2s ease-in-out infinite; }
+  .upsell-title { font-family: 'Sora', sans-serif; font-size: 30px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 10px; }
+  .upsell-sub { font-size: 14px; color: var(--text2); line-height: 1.5; }
+  .upsell-price-block { text-align: center; padding: 20px 28px; }
+  .upsell-price { font-family: 'Sora', sans-serif; font-size: 58px; font-weight: 800; color: var(--gold); line-height: 1; }
+  .upsell-price-period { font-size: 16px; color: var(--text2); margin-top: 4px; }
+  .upsell-compare { font-size: 12px; color: var(--text3); margin-top: 6px; }
+  .upsell-compare s { color: var(--red); }
+  .upsell-features { padding: 0 28px 24px; display: flex; flex-direction: column; gap: 10px; }
+  .upsell-feature {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .upsell-feature-icon { font-size: 22px; }
+  .upsell-feature-text { flex: 1; }
+  .upsell-feature-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .upsell-feature-sub { font-size: 12px; color: var(--text3); }
+  .upsell-footer { padding: 0 28px 40px; }
+  .upsell-cancel { text-align: center; font-size: 12px; color: var(--text3); margin-top: 12px; }
+  .upsell-skip { text-align: center; font-size: 13px; color: var(--text2); margin-top: 10px; cursor: pointer; text-decoration: underline; }
+
+  /* ===== HOME ===== */
+  .home-header {
+    padding: 56px 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .home-logo { display: flex; align-items: center; gap: 8px; }
+  .home-logo-badge {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .home-logo-name { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); }
+  .home-header-icons { display: flex; gap: 12px; }
+  .home-icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; position: relative;
+  }
+  .badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); font-size: 8px; font-weight: 700; color: #1a0f00; display: flex; align-items: center; justify-content: center; }
+  .location-chip {
+    margin: 0 24px 20px;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px; color: var(--text2);
+  }
+  .location-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+  /* UV Ring */
+  .uv-section { padding: 0 24px 20px; }
+  .uv-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .uv-card::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 100px;
+    background: radial-gradient(ellipse, rgba(232,160,32,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .uv-ring { position: relative; width: 120px; height: 120px; margin: 0 auto 16px; }
+  .uv-ring svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+  .uv-ring-track { fill: none; stroke: var(--bg3); stroke-width: 8; }
+  .uv-ring-fill { fill: none; stroke: url(#uvGradient); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 314; stroke-dashoffset: 94; transition: stroke-dashoffset 1s ease; }
+  .uv-number {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-family: 'Sora', sans-serif; font-size: 38px; font-weight: 800; color: var(--gold);
+  }
+  .uv-status { font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 6px; }
+  .uv-status::before { content: '● '; }
+  .uv-tip { font-size: 12px; color: var(--text2); }
+  .uv-tip a { color: var(--gold); text-decoration: none; }
+
+  /* Quick Actions */
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 0 24px 12px; }
+  .section-title { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+  .section-tag { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--bg4); color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 24px 20px; }
+  .quick-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quick-card:active { transform: scale(0.97); background: var(--bg3); }
+  .quick-card.active-tab { border-color: var(--gold); background: var(--card-gold); }
+  .quick-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .quick-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .quick-sub { font-size: 11px; color: var(--text3); }
+
+  /* Today's Plan */
+  .plan-section { padding: 0 24px 100px; }
+  .plan-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .plan-step {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--card-border);
+    position: relative;
+  }
+  .plan-step:last-child { border-bottom: none; }
+  .plan-step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--gold);
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    color: #1a0f00;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .plan-step-info { flex: 1; }
+  .plan-step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .plan-step-sub { font-size: 11px; color: var(--text3); }
+  .plan-step-time { font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600; color: var(--gold); }
+  .plan-product-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(232,160,32,0.1);
+    border: 1px solid rgba(232,160,32,0.2);
+    border-radius: 6px;
+    padding: 3px 8px; margin-top: 6px;
+    font-size: 10px; color: var(--gold);
+  }
+
+  /* NAV BAR */
+  .nav-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 82px;
+    background: rgba(14,13,11,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--card-border);
+    display: flex; align-items: center;
+    padding: 0 8px 16px;
+    z-index: 50;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 0;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 10px; font-weight: 500; color: var(--text3); transition: color 0.2s; }
+  .nav-item.active .nav-label { color: var(--gold); }
+  .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); display: none; }
+  .nav-item.active .nav-dot { display: block; }
+
+  /* ===== TIMER ===== */
+  .timer-header {
+    padding: 56px 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .timer-title { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .timer-settings { width: 36px; height: 36px; border-radius: 10px; background: var(--card); border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; }
+  .pro-banner {
+    margin: 0 24px 20px;
+    background: linear-gradient(135deg, rgba(232,160,32,0.08), rgba(232,160,32,0.04));
+    border: 1px solid rgba(232,160,32,0.2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pro-banner-left { display: flex; align-items: center; gap: 10px; }
+  .pro-badge { font-size: 11px; font-weight: 700; padding: 4px 8px; background: var(--gold); color: #1a0f00; border-radius: 6px; }
+  .pro-banner-text { font-size: 13px; color: var(--text2); }
+  .timer-circle-wrap { padding: 10px 24px 28px; display: flex; flex-direction: column; align-items: center; }
+  .timer-circle { position: relative; width: 220px; height: 220px; }
+  .timer-circle svg { width: 220px; height: 220px; transform: rotate(-90deg); }
+  .timer-circle-track { fill: none; stroke: var(--bg3); stroke-width: 10; }
+  .timer-circle-fill { fill: none; stroke: url(#timerGrad); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 628; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+  .timer-display {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .timer-time { font-family: 'Sora', sans-serif; font-size: 44px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
+  .timer-side { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .timer-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 24px; }
+  .timer-btn-secondary {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer; transition: all 0.2s;
+  }
+  .timer-btn-play {
+    width: 68px; height: 68px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 8px 24px var(--gold-glow);
+  }
+  .timer-btn-play:active, .timer-btn-secondary:active { transform: scale(0.93); }
+  .timer-settings-list { padding: 0 24px 100px; display: flex; flex-direction: column; gap: 1px; }
+  .timer-setting {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+  }
+  .timer-setting-left { display: flex; align-items: center; gap: 12px; }
+  .timer-setting-icon { font-size: 20px; }
+  .timer-setting-info {}
+  .timer-setting-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .timer-setting-sub { font-size: 11px; color: var(--text3); }
+  .toggle {
+    width: 48px; height: 28px; border-radius: 14px;
+    background: var(--gold);
+    position: relative; cursor: pointer; transition: background 0.2s;
+  }
+  .toggle::after { content: ''; width: 22px; height: 22px; border-radius: 50%; background: white; position: absolute; top: 3px; right: 3px; transition: right 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+  .toggle.off { background: var(--bg4); }
+  .toggle.off::after { right: 23px; }
+  .time-select {
+    background: var(--bg4);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  /* ===== TANSNAP ===== */
+  .tansnap-header {
+    padding: 56px 24px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .tansnap-title { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .tansnap-header-icons { display: flex; gap: 10px; }
+  .free-counter {
+    font-size: 12px; color: var(--text2);
+    margin: 0 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .free-counter-upgrade { color: var(--gold); font-weight: 600; cursor: pointer; }
+  .post-prompt {
+    margin: 0 24px 20px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer;
+  }
+  .post-prompt-icon { font-size: 28px; }
+  .post-prompt-text { flex: 1; }
+  .post-prompt-title { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: #1a0f00; }
+  .post-prompt-sub { font-size: 12px; color: rgba(26,15,0,0.7); }
+  .stories-row { padding: 0 24px 20px; display: flex; gap: 14px; overflow-x: auto; }
+  .stories-row::-webkit-scrollbar { display: none; }
+  .story-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; flex-shrink: 0; }
+  .story-ring {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 2px solid var(--gold);
+    padding: 2px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .story-ring.add { border-style: dashed; border-color: var(--text3); }
+  .story-avatar { width: 100%; height: 100%; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .story-name { font-size: 10px; color: var(--text2); }
+  .feed { padding: 0 24px 100px; display: flex; flex-direction: column; gap: 16px; }
+  .feed-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); overflow: hidden; }
+  .feed-card-header { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .feed-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .feed-user-info { flex: 1; }
+  .feed-username { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .feed-uv-chip {
+    background: var(--gold-dim);
+    border: 1px solid rgba(232,160,32,0.3);
+    border-radius: 8px; padding: 2px 6px;
+    font-size: 10px; font-weight: 600; color: var(--gold);
+  }
+  .feed-time { font-size: 11px; color: var(--text3); }
+  .feed-more { font-size: 18px; color: var(--text3); cursor: pointer; }
+  .feed-image {
+    width: 100%; aspect-ratio: 4/3;
+    object-fit: cover;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px; position: relative; overflow: hidden;
+  }
+  .feed-image-bg {
+    width: 100%; aspect-ratio: 4/3;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px; position: relative;
+  }
+  .feed-location-chip {
+    position: absolute; bottom: 12px; left: 12px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 11px; color: var(--text); font-weight: 500;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .feed-product-chip {
+    position: absolute; bottom: 12px; right: 12px;
+    background: var(--gold);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 11px; color: #1a0f00; font-weight: 700;
+  }
+  .feed-actions { padding: 12px 16px; display: flex; align-items: center; gap: 16px; }
+  .feed-action { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); cursor: pointer; }
+  .feed-action-icon { font-size: 18px; }
+  .feed-save { margin-left: auto; font-size: 20px; cursor: pointer; color: var(--text3); }
+  .feed-caption { padding: 0 16px 12px; font-size: 13px; color: var(--text); line-height: 1.5; }
+  .feed-caption strong { color: var(--text); font-weight: 600; }
+  .feed-comments { padding: 0 16px 14px; font-size: 12px; color: var(--text3); cursor: pointer; }
+
+  /* ===== SHOP ===== */
+  .shop-header {
+    padding: 56px 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .shop-title { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .cart-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--card); border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; position: relative; }
+  .pro-shop-banner {
+    margin: 0 24px 16px;
+    background: linear-gradient(135deg, rgba(232,160,32,0.1), rgba(232,160,32,0.05));
+    border: 1px solid rgba(232,160,32,0.25);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .pro-shop-icon { font-size: 28px; }
+  .pro-shop-text-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .pro-shop-text-sub { font-size: 11px; color: var(--text2); }
+  .filter-row { padding: 0 24px 16px; display: flex; gap: 8px; overflow-x: auto; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    padding: 8px 16px; border-radius: 20px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    font-size: 13px; font-weight: 500; color: var(--text2);
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .filter-chip.active { background: var(--gold); color: #1a0f00; border-color: var(--gold); font-weight: 700; }
+  .product-list { padding: 0 24px 100px; display: flex; flex-direction: column; gap: 12px; }
+  .product-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .product-card:active { transform: scale(0.99); }
+  .product-img { width: 64px; height: 64px; border-radius: 12px; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+  .product-info { flex: 1; }
+  .product-name { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .product-desc { font-size: 11px; color: var(--text3); line-height: 1.4; margin-bottom: 8px; }
+  .product-row { display: flex; align-items: center; gap: 8px; }
+  .product-price { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gold); }
+  .product-stars { font-size: 10px; color: var(--gold); }
+  .product-reviews { font-size: 10px; color: var(--text3); }
+  .product-badge {
+    font-size: 10px; font-weight: 700; padding: 3px 7px;
+    border-radius: 5px; margin-left: auto;
+  }
+  .badge-bestseller { background: rgba(76,175,125,0.2); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+  .badge-new { background: rgba(232,160,32,0.15); color: var(--gold); border: 1px solid rgba(232,160,32,0.3); }
+  .add-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--gold);
+    border: none; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: #1a0f00;
+    cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+    align-self: center;
+  }
+  .add-btn:active { transform: scale(0.9); }
+
+  /* ===== PROFILE ===== */
+  .profile-screen-header { padding: 56px 24px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .profile-screen-title { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); }
+  .profile-top { display: flex; flex-direction: column; align-items: center; padding: 0 24px 24px; }
+  .profile-avatar-ring {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-dark));
+    padding: 3px; margin-bottom: 16px;
+  }
+  .profile-avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .profile-name { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .profile-since { font-size: 12px; color: var(--text3); margin-bottom: 12px; }
+  .plan-chip { padding: 6px 14px; border-radius: 20px; background: var(--bg4); border: 1px solid var(--card-border); font-size: 12px; font-weight: 600; color: var(--text3); }
+  .profile-stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; padding: 0 24px 20px; }
+  .profile-stat { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-sm); padding: 14px 10px; text-align: center; }
+  .profile-stat-val { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+  .profile-stat-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .pro-upsell-card {
+    margin: 0 24px 20px;
+    background: linear-gradient(135deg, rgba(232,160,32,0.12), rgba(232,160,32,0.05));
+    border: 1px solid rgba(232,160,32,0.3);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .pro-upsell-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .pro-upsell-icon { font-size: 24px; }
+  .pro-upsell-name { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 800; color: var(--gold); }
+  .pro-upsell-price { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; color: var(--gold); }
+  .pro-upsell-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .pro-upsell-feature { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); }
+  .pro-upsell-check { color: var(--gold); font-weight: 700; }
+  .profile-menu { padding: 0 24px 24px; display: flex; flex-direction: column; gap: 0; }
+  .menu-section-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; padding: 16px 0 8px; }
+  .menu-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--card-border);
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:active { opacity: 0.7; }
+  .menu-item-icon { font-size: 22px; width: 36px; text-align: center; }
+  .menu-item-label { flex: 1; font-size: 15px; font-weight: 500; color: var(--text); }
+  .menu-item-arrow { color: var(--text3); font-size: 16px; }
+  .menu-bottom-space { height: 80px; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: absolute;
+    top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: var(--bg3);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    font-size: 13px; color: var(--text);
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== LOADING OVERLAY ===== */
+  .loading-overlay {
+    position: absolute; inset: 0;
+    background: rgba(14,13,11,0.92);
+    backdrop-filter: blur(10px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 150;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .loading-overlay.show { opacity: 1; pointer-events: all; }
+  .loading-spinner { width: 60px; height: 60px; border: 3px solid var(--bg3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px; }
+  .loading-text { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .loading-sub { font-size: 13px; color: var(--text2); animation: pulse 1.5s ease infinite; }
+
+  /* INTRO SCREEN */
+  #intro {
+    background: radial-gradient(ellipse at 50% 0%, rgba(232,160,32,0.2) 0%, transparent 60%), var(--bg);
+    justify-content: space-between;
+  }
+  .intro-top { padding: 80px 36px 20px; }
+  .intro-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--gold-dim);
+    border: 1px solid rgba(232,160,32,0.3);
+    border-radius: 20px; padding: 6px 14px; margin-bottom: 24px;
+    font-size: 12px; font-weight: 600; color: var(--gold);
+  }
+  .intro-headline { font-family: 'Sora', sans-serif; font-size: 40px; font-weight: 800; color: var(--text); line-height: 1.1; letter-spacing: -1px; margin-bottom: 16px; }
+  .intro-headline span { color: var(--gold); }
+  .intro-sub { font-size: 15px; color: var(--text2); line-height: 1.6; }
+  .intro-visual { padding: 0 36px; display: flex; justify-content: center; }
+  .intro-sun-big { font-size: 120px; animation: bounce 3s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(232,160,32,0.4)); }
+  .intro-bottom { padding: 20px 28px 50px; }
+  .social-login { display: flex; gap: 10px; margin-top: 16px; }
+  .social-btn {
+    flex: 1; padding: 14px; border-radius: var(--radius);
+    background: var(--card); border: 1px solid var(--card-border);
+    font-size: 14px; font-weight: 600; color: var(--text);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .social-btn:active { background: var(--bg3); }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+  .divider-line { flex: 1; height: 1px; background: var(--card-border); }
+  .divider-text { font-size: 12px; color: var(--text3); }
+  .login-link { text-align: center; font-size: 13px; color: var(--text3); margin-top: 14px; }
+  .login-link a { color: var(--gold); text-decoration: none; font-weight: 600; }
+
+  /* Skin tone colors */
+  .skin-1 { background: #FDDCB5; }
+  .skin-2 { background: #F5C59A; }
+  .skin-3 { background: #E8A878; }
+  .skin-4 { background: #D48A55; }
+  .skin-5 { background: #A0612E; }
+  .skin-6 { background: #5C3010; }
+
+  /* responsive for desktop viewing */
+  @media (max-width: 420px) {
+    .phone-shell { width: 100vw; height: 100vh; border-radius: 0; }
+    body { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-shell" id="app">
+
+  <!-- Notch & Status Bar -->
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33C16.4 22 17 21.4 17 20.67V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- SVG Defs -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="uvGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#F5BC50"/>
+        <stop offset="100%" stop-color="#E8A020"/>
+      </linearGradient>
+      <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#F5BC50"/>
+        <stop offset="100%" stop-color="#C4841A"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Analyzing your skin...</div>
+    <div class="loading-sub">This takes just a moment</div>
+  </div>
+
+  <!-- ==================== SCREEN: INTRO ==================== -->
+  <div class="screen active" id="intro">
+    <div class="intro-top">
+      <div class="intro-badge">✨ The smartest way to tan</div>
+      <h1 class="intro-headline">Your perfect<br><span>tan</span> starts<br>here.</h1>
+      <p class="intro-sub">Personalized plans, UV tracking, and social tanning — all in one place.</p>
+    </div>
+    <div class="intro-visual">
+      <span class="intro-sun-big">☀️</span>
+    </div>
+    <div class="intro-bottom">
+      <button class="btn-primary" onclick="go('splash')">Get Started ✨</button>
+      <div class="social-login">
+        <button class="social-btn" onclick="go('splash')">🍎 Apple</button>
+        <button class="social-btn" onclick="go('splash')">🌐 Google</button>
+      </div>
+      <div class="divider"><div class="divider-line"></div><span class="divider-text">or</span><div class="divider-line"></div></div>
+      <button class="btn-secondary" onclick="go('splash')">Sign in with Email</button>
+      <div class="login-link">Already have an account? <a onclick="go('splash')">Log in</a></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: SPLASH / WELCOME ==================== -->
+  <div class="screen" id="splash">
+    <div class="splash-content">
+      <div class="splash-logo-wrap">
+        <span class="splash-sun">☀️</span>
+      </div>
+      <h1 class="splash-brand">Welcome to <span>Thryv Tan</span></h1>
+      <p class="splash-tagline">The smartest way to get your perfect tan. Let's personalize your experience in 60 seconds.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-card-icon">🎯</span>
+          <div class="feature-card-title">AI-Powered</div>
+          <div class="feature-card-sub">Custom tan plans</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">📸</span>
+          <div class="feature-card-title">TanSnap</div>
+          <div class="feature-card-sub">Social tanning</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">🔬</span>
+          <div class="feature-card-title">Skin Scanner</div>
+          <div class="feature-card-sub">Track your glow</div>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">⏱️</span>
+          <div class="feature-card-title">Smart Timer</div>
+          <div class="feature-card-sub">Flip alerts</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="go('quiz1')">Let's Go ●</button>
+    </div>
+  </div>
+
+  <!-- ==================== QUIZ 1: SKIN TYPE ==================== -->
+  <div class="screen" id="quiz1">
+    <div class="progress-dots">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="quiz-header">
+      <span class="quiz-emoji">🧬</span>
+      <h1 class="quiz-title">What's your skin type?</h1>
+      <p class="quiz-subtitle">This helps us calculate your perfect tan time and SPF needs.</p>
+    </div>
+    <div class="quiz-body">
+      <div class="option-list" id="skinOptions">
+        <div class="option-card" onclick="selectOption('skinOptions', this, 'quiz2')">
+          <div class="option-swatch skin-1"></div>
+          <div class="option-text">
+            <div class="option-title">Type I — Very Fair</div>
+            <div class="option-sub">Always burns, rarely tans</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('skinOptions', this, 'quiz2')">
+          <div class="option-swatch skin-2"></div>
+          <div class="option-text">
+            <div class="option-title">Type II — Fair</div>
+            <div class="option-sub">Burns easily, tans lightly</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('skinOptions', this, 'quiz2')">
+          <div class="option-swatch skin-3"></div>
+          <div class="option-text">
+            <div class="option-title">Type III — Medium</div>
+            <div class="option-sub">Sometimes burns, tans evenly</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('skinOptions', this, 'quiz2')">
+          <div class="option-swatch skin-4"></div>
+          <div class="option-text">
+            <div class="option-title">Type IV — Olive</div>
+            <div class="option-sub">Rarely burns, tans easily</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('skinOptions', this, 'quiz2')">
+          <div class="option-swatch skin-5"></div>
+          <div class="option-text">
+            <div class="option-title">Type V — Brown</div>
+            <div class="option-sub">Very rarely burns, tans darkly</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('skinOptions', this, 'quiz2')">
+          <div class="option-swatch skin-6"></div>
+          <div class="option-text">
+            <div class="option-title">Type VI — Deep</div>
+            <div class="option-sub">Never burns, deeply pigmented</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+      </div>
+    </div>
+    <div class="quiz-footer">
+      <button class="btn-primary" onclick="go('quiz2')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ==================== QUIZ 2: TAN GOAL ==================== -->
+  <div class="screen" id="quiz2">
+    <div class="progress-dots">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="quiz-header">
+      <span class="quiz-emoji">🎯</span>
+      <h1 class="quiz-title">What's your tan goal?</h1>
+      <p class="quiz-subtitle">We'll build your routine around this.</p>
+    </div>
+    <div class="quiz-body">
+      <div class="option-list" id="goalOptions">
+        <div class="option-card" onclick="selectOption('goalOptions', this, 'quiz3')">
+          <div class="option-icon">🌅</div>
+          <div class="option-text">
+            <div class="option-title">Sun-Kissed Glow</div>
+            <div class="option-sub">Subtle, natural warmth</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('goalOptions', this, 'quiz3')">
+          <div class="option-icon">✨</div>
+          <div class="option-text">
+            <div class="option-title">Golden Tan</div>
+            <div class="option-sub">Visible, even bronze</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card selected" onclick="selectOption('goalOptions', this, 'quiz3')">
+          <div class="option-icon">🔥</div>
+          <div class="option-text">
+            <div class="option-title">Deep Bronze</div>
+            <div class="option-sub">Rich, deep color</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('goalOptions', this, 'quiz3')">
+          <div class="option-icon">🔄</div>
+          <div class="option-text">
+            <div class="option-title">Maintain My Tan</div>
+            <div class="option-sub">I'm already tan, keep it</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+      </div>
+    </div>
+    <div class="quiz-footer">
+      <button class="btn-primary" onclick="go('quiz3')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ==================== QUIZ 3: FREQUENCY ==================== -->
+  <div class="screen" id="quiz3">
+    <div class="progress-dots">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="quiz-header">
+      <span class="quiz-emoji">📅</span>
+      <h1 class="quiz-title">How often do you tan?</h1>
+      <p class="quiz-subtitle">No wrong answer — we'll adapt to your schedule.</p>
+    </div>
+    <div class="quiz-body">
+      <div class="option-list" id="freqOptions">
+        <div class="option-card" onclick="selectOption('freqOptions', this, 'scanner')">
+          <div class="option-icon">🌱</div>
+          <div class="option-text">
+            <div class="option-title">I'm New to This</div>
+            <div class="option-sub">First time or very rarely</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('freqOptions', this, 'scanner')">
+          <div class="option-icon">☀️</div>
+          <div class="option-text">
+            <div class="option-title">Casually</div>
+            <div class="option-sub">A few times a month</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card selected" onclick="selectOption('freqOptions', this, 'scanner')">
+          <div class="option-icon">🔥</div>
+          <div class="option-text">
+            <div class="option-title">Regularly</div>
+            <div class="option-sub">Multiple times a week</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+        <div class="option-card" onclick="selectOption('freqOptions', this, 'scanner')">
+          <div class="option-icon">💪</div>
+          <div class="option-text">
+            <div class="option-title">Daily</div>
+            <div class="option-sub">Tanning is my routine</div>
+          </div>
+          <div class="option-check"></div>
+        </div>
+      </div>
+    </div>
+    <div class="quiz-footer">
+      <button class="btn-primary" onclick="go('scanner')">Continue</button>
+    </div>
+  </div>
+
+  <!-- ==================== SKIN SCANNER ==================== -->
+  <div class="screen" id="scanner">
+    <div class="progress-dots">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot active"></div>
+    </div>
+    <div class="scanner-header">
+      <span class="scanner-icon">🔬</span>
+      <h1 class="scanner-title">Let's Scan Your Skin Tone</h1>
+      <p class="scanner-sub">We'll analyze your starting shade to track your tan progress over time. This is your free baseline scan!</p>
+    </div>
+    <div class="scanner-area-wrap">
+      <div class="scanner-circle" id="scanCircle">
+        <div class="scanner-circle-ring" id="scanRing"></div>
+        <div class="scan-line" id="scanLine"></div>
+        <span class="scanner-hand">✋</span>
+      </div>
+      <p class="scanner-instruction" id="scanInstruction">Tap the button below to scan.<br><em>Hold your wrist to the camera.</em></p>
+      <div class="scan-direction" id="scanDirection"></div>
+    </div>
+    <div class="scanner-footer">
+      <button class="btn-primary" id="scanBtn" onclick="startScan()">Scan My Skin ✨</button>
+    </div>
+  </div>
+
+  <!-- ==================== TAN PROFILE ==================== -->
+  <div class="screen" id="tanProfile">
+    <div class="progress-dots">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+    </div>
+    <div class="profile-header">
+      <span class="quiz-emoji">🎉</span>
+      <h1 class="quiz-title" style="text-align:center">Your Tan Profile</h1>
+      <p class="quiz-subtitle" style="text-align:center">Here's your personalized starting point.</p>
+    </div>
+    <div class="profile-card">
+      <div class="profile-shade-circle skin-3" style="background:#E8A878"></div>
+      <div class="profile-shade-name">Light Medium</div>
+      <div class="profile-shade-num">Shade 4 of 10</div>
+      <div class="shade-slider-track">
+        <div class="shade-slider-thumb" style="left: 33%"></div>
+      </div>
+      <div class="shade-labels"><span>Fair</span><span>Medium</span><span>Deep</span></div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-card">
+        <div class="stat-value">18 min</div>
+        <div class="stat-label">Per Side</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">SPF 15</div>
+        <div class="stat-label">Recommended</div>
+      </div>
+    </div>
+    <div class="profile-banner">
+      <span class="profile-banner-icon">✅</span>
+      Your personalized tan plan is ready! We'll track your progress with each scan.
+    </div>
+    <div style="padding: 0 28px 40px">
+      <button class="btn-primary" onclick="go('upsell')">See My Plan →</button>
+    </div>
+  </div>
+
+  <!-- ==================== UPSELL ==================== -->
+  <div class="screen" id="upsell">
+    <div class="upsell-header">
+      <span class="upsell-crown">👑</span>
+      <h1 class="upsell-title">Unlock Your Full<br>Tan Potential</h1>
+      <p class="upsell-sub">Get the plan, tracking, and community that'll actually get you results.</p>
+    </div>
+    <div class="upsell-price-block">
+      <div class="upsell-price">$5.99</div>
+      <div class="upsell-price-period">per month</div>
+      <div class="upsell-compare">Competitors charge <s>$12.99/week</s> — you save $46+/mo</div>
+    </div>
+    <div class="upsell-features">
+      <div class="upsell-feature">
+        <span class="upsell-feature-icon">🔬</span>
+        <div class="upsell-feature-text">
+          <div class="upsell-feature-title">Unlimited Skin Scans</div>
+          <div class="upsell-feature-sub">Track your tan progress</div>
+        </div>
+      </div>
+      <div class="upsell-feature">
+        <span class="upsell-feature-icon">🎯</span>
+        <div class="upsell-feature-text">
+          <div class="upsell-feature-title">AI Tan Plans</div>
+          <div class="upsell-feature-sub">Personalized to your skin + goals</div>
+        </div>
+      </div>
+      <div class="upsell-feature">
+        <span class="upsell-feature-icon">📸</span>
+        <div class="upsell-feature-text">
+          <div class="upsell-feature-title">Unlimited TanSnaps</div>
+          <div class="upsell-feature-sub">Post, stories & challenges</div>
+        </div>
+      </div>
+      <div class="upsell-feature">
+        <span class="upsell-feature-icon">⏱️</span>
+        <div class="upsell-feature-text">
+          <div class="upsell-feature-title">Smart Timer</div>
+          <div class="upsell-feature-sub">Flip alerts with sound & vibration</div>
+        </div>
+      </div>
+      <div class="upsell-feature">
+        <span class="upsell-feature-icon">🛡️</span>
+        <div class="upsell-feature-text">
+          <div class="upsell-feature-title">Burn Detection</div>
+          <div class="upsell-feature-sub">Recovery mode if you overdo it</div>
+        </div>
+      </div>
+      <div class="upsell-feature">
+        <span class="upsell-feature-icon">🛍️</span>
+        <div class="upsell-feature-text">
+          <div class="upsell-feature-title">20% Off Products</div>
+          <div class="upsell-feature-sub">All Thryv Supps, always</div>
+        </div>
+      </div>
+    </div>
+    <div class="upsell-footer">
+      <button class="btn-primary" onclick="showToast('🎉 7-Day free trial started!'); setTimeout(() => go('home'), 1000)">Start 7-Day Free Trial</button>
+      <div class="upsell-cancel">Cancel anytime. No commitment. Seriously.</div>
+      <div class="upsell-skip" onclick="go('home')">Continue with limited access</div>
+    </div>
+  </div>
+
+  <!-- ==================== HOME ==================== -->
+  <div class="screen" id="home">
+    <div class="home-header">
+      <div class="home-logo">
+        <div class="home-logo-badge">☀️</div>
+        <span class="home-logo-name">Thryv Tan</span>
+      </div>
+      <div class="home-header-icons">
+        <div class="home-icon-btn">🔔<span class="badge">2</span></div>
+        <div class="home-icon-btn">👤</div>
+      </div>
+    </div>
+    <div class="location-chip">
+      <div class="dot"></div>
+      Greensboro, NC
+    </div>
+    <div class="uv-section">
+      <div class="uv-card">
+        <div class="uv-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="uv-ring-track" cx="60" cy="60" r="50"/>
+            <circle class="uv-ring-fill" cx="60" cy="60" r="50"/>
+          </svg>
+          <div class="uv-number">6</div>
+        </div>
+        <div class="uv-status">High — Great tanning conditions</div>
+        <p class="uv-tip">General Tip: UV is moderate today. <a onclick="go('upsell')">Upgrade for AI recommendations →</a></p>
+      </div>
+    </div>
+    <div class="section-header">
+      <span class="section-title">Quick Access</span>
+    </div>
+    <div class="quick-grid">
+      <div class="quick-card" onclick="switchTab('timer')">
+        <span class="quick-icon">⏱️</span>
+        <div class="quick-title">Start Tanning</div>
+        <div class="quick-sub">AI-timed session</div>
+      </div>
+      <div class="quick-card" onclick="go('scanner')">
+        <span class="quick-icon">🔬</span>
+        <div class="quick-title">Skin Scanner</div>
+        <div class="quick-sub">Track your shade</div>
+      </div>
+      <div class="quick-card" onclick="switchTab('tansnap')">
+        <span class="quick-icon">📸</span>
+        <div class="quick-title">TanSnap</div>
+        <div class="quick-sub">Share your glow</div>
+      </div>
+      <div class="quick-card" onclick="switchTab('shop')">
+        <span class="quick-icon">🛒</span>
+        <div class="quick-title">Tan Shop</div>
+        <div class="quick-sub">Gear & products</div>
+      </div>
+    </div>
+    <div class="section-header">
+      <span class="section-title">Today's Tan Plan</span>
+      <span class="section-tag">BASIC</span>
+    </div>
+    <div class="plan-section">
+      <div class="plan-card">
+        <div class="plan-step">
+          <div class="plan-step-num">1</div>
+          <div class="plan-step-info">
+            <div class="plan-step-title">Apply Pre-Tan Primer</div>
+            <div class="plan-step-sub">Even base for streak-free tan</div>
+            <div class="plan-product-chip">🧴 Thryv Bronze Primer — $24.99</div>
+          </div>
+          <div class="plan-step-time">5 min</div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">2</div>
+          <div class="plan-step-info">
+            <div class="plan-step-title">Front Side Tan</div>
+            <div class="plan-step-sub">Optimal angle based on sun position</div>
+          </div>
+          <div class="plan-step-time">18 min</div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">3</div>
+          <div class="plan-step-info">
+            <div class="plan-step-title">Flip Alert — Turn Over</div>
+            <div class="plan-step-sub">Back side for even coverage</div>
+          </div>
+          <div class="plan-step-time">18 min</div>
+        </div>
+        <div class="plan-step">
+          <div class="plan-step-num">4</div>
+          <div class="plan-step-info">
+            <div class="plan-step-title">Apply After-Sun Hydrator</div>
+            <div class="plan-step-sub">Lock in color, keep skin soft</div>
+            <div class="plan-product-chip">💧 After-Sun Glow Hydrator — $19.99</div>
+          </div>
+          <div class="plan-step-time">5 min</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item active" onclick="switchTab('home')">
+        <span class="nav-icon">☀️</span>
+        <span class="nav-label">Home</span>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="nav-item" onclick="switchTab('timer')">
+        <span class="nav-icon">⏱️</span>
+        <span class="nav-label">Timer</span>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="nav-item" onclick="switchTab('tansnap')">
+        <span class="nav-icon">📸</span>
+        <span class="nav-label">TanSnap</span>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="nav-item" onclick="switchTab('shop')">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">Shop</span>
+        <div class="nav-dot"></div>
+      </div>
+      <div class="nav-item" onclick="switchTab('profile')">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+        <div class="nav-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TIMER ==================== -->
+  <div class="screen" id="timer">
+    <div class="timer-header">
+      <div class="timer-title">⏱️ Tan Timer</div>
+      <div class="timer-settings" onclick="showToast('⚙️ Settings')">⚙️</div>
+    </div>
+    <div class="pro-banner">
+      <div class="pro-banner-left">
+        <span class="pro-badge">PRO</span>
+        <span class="pro-banner-text">AI Timer Recommendations</span>
+      </div>
+      <span style="font-size:12px;color:var(--gold);cursor:pointer" onclick="go('upsell')">Upgrade</span>
+    </div>
+    <div class="timer-circle-wrap">
+      <div class="timer-circle">
+        <svg viewBox="0 0 220 220">
+          <circle class="timer-circle-track" cx="110" cy="110" r="100"/>
+          <circle class="timer-circle-fill" id="timerArc" cx="110" cy="110" r="100"/>
+        </svg>
+        <div class="timer-display">
+          <div class="timer-time" id="timerDisplay">18:00</div>
+          <div class="timer-side" id="timerSide">Front Side</div>
+        </div>
+      </div>
+      <div class="timer-controls">
+        <div class="timer-btn-secondary" onclick="resetTimer()">↺</div>
+        <div class="timer-btn-play" id="playBtn" onclick="toggleTimer()">▶</div>
+        <div class="timer-btn-secondary" onclick="skipTimer()">⏭</div>
+      </div>
+    </div>
+    <div class="timer-settings-list">
+      <div class="timer-setting">
+        <div class="timer-setting-left">
+          <span class="timer-setting-icon">⏱️</span>
+          <div class="timer-setting-info">
+            <div class="timer-setting-title">Time Per Side</div>
+            <div class="timer-setting-sub">Based on UV 6 & your skin type</div>
+          </div>
+        </div>
+        <select class="time-select" onchange="setTimerTime(this.value)">
+          <option value="18">18 mi</option>
+          <option value="15">15 mi</option>
+          <option value="20">20 mi</option>
+          <option value="25">25 mi</option>
+        </select>
+      </div>
+      <div class="timer-setting">
+        <div class="timer-setting-left">
+          <span class="timer-setting-icon">🔔</span>
+          <div class="timer-setting-info">
+            <div class="timer-setting-title">Flip Alert Sound</div>
+            <div class="timer-setting-sub">Loud alarm when it's time to turn</div>
+          </div>
+        </div>
+        <div class="toggle" onclick="this.classList.toggle('off')"></div>
+      </div>
+      <div class="timer-setting">
+        <div class="timer-setting-left">
+          <span class="timer-setting-icon">📳</span>
+          <div class="timer-setting-info">
+            <div class="timer-setting-title">Vibration Alert</div>
+            <div class="timer-setting-sub">Double buzz notification</div>
+          </div>
+        </div>
+        <div class="toggle" onclick="this.classList.toggle('off')"></div>
+      </div>
+      <div class="timer-setting">
+        <div class="timer-setting-left">
+          <span class="timer-setting-icon">📸</span>
+          <div class="timer-setting-info">
+            <div class="timer-setting-title">TanSnap Reminder</div>
+            <div class="timer-setting-sub">Prompt to post after session ends</div>
+          </div>
+        </div>
+        <div class="toggle" onclick="this.classList.toggle('off')"></div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="switchTab('home')"><span class="nav-icon">☀️</span><span class="nav-label">Home</span><div class="nav-dot"></div></div>
+      <div class="nav-item active" onclick="switchTab('timer')"><span class="nav-icon">⏱️</span><span class="nav-label">Timer</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('tansnap')"><span class="nav-icon">📸</span><span class="nav-label">TanSnap</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span class="nav-label">Shop</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><div class="nav-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== TANSNAP ==================== -->
+  <div class="screen" id="tansnap">
+    <div class="tansnap-header">
+      <div class="tansnap-title">📸 TanSnap</div>
+      <div class="tansnap-header-icons">
+        <div class="home-icon-btn">👥</div>
+        <div class="home-icon-btn">✉️<span class="badge">3</span></div>
+      </div>
+    </div>
+    <div class="free-counter">
+      <span>🆓 3 of 3 free posts left</span>
+      <span class="free-counter-upgrade" onclick="go('upsell')">Upgrade ↗</span>
+    </div>
+    <div class="post-prompt" onclick="showToast('📸 Camera opening...')">
+      <span class="post-prompt-icon">☀️</span>
+      <div class="post-prompt-text">
+        <div class="post-prompt-title">Post Your TanSnap!</div>
+        <div class="post-prompt-sub">UV is 6 right now — perfect conditions</div>
+      </div>
+      <span style="font-size:20px">+</span>
+    </div>
+    <div class="stories-row">
+      <div class="story-item">
+        <div class="story-ring add">
+          <div class="story-avatar">+</div>
+        </div>
+        <span class="story-name">Your Snap</span>
+      </div>
+      <div class="story-item" onclick="showToast('👀 Sophia\'s story')">
+        <div class="story-ring">
+          <div class="story-avatar">😎</div>
+        </div>
+        <span class="story-name">Sophia</span>
+      </div>
+      <div class="story-item" onclick="showToast('👀 Jake\'s story')">
+        <div class="story-ring">
+          <div class="story-avatar">🤙</div>
+        </div>
+        <span class="story-name">Jake</span>
+      </div>
+      <div class="story-item" onclick="showToast('👀 Hailey\'s story')">
+        <div class="story-ring">
+          <div class="story-avatar">🌸</div>
+        </div>
+        <span class="story-name">Hailey</span>
+      </div>
+      <div class="story-item" onclick="showToast('👀 Marcus\'s story')">
+        <div class="story-ring">
+          <div class="story-avatar">🏖️</div>
+        </div>
+        <span class="story-name">Marcus</span>
+      </div>
+    </div>
+    <div class="feed">
+      <!-- Post 1 -->
+      <div class="feed-card">
+        <div class="feed-card-header">
+          <div class="feed-avatar">😎</div>
+          <div class="feed-user-info">
+            <div class="feed-username">Sophia <span class="feed-uv-chip">UV 7</span></div>
+            <div class="feed-time">12 min ago</div>
+          </div>
+          <div class="feed-more">•••</div>
+        </div>
+        <div class="feed-image-bg" style="background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 60%, #C4A882 60%, #C4A882 100%)">
+          <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:60px">🏖️</div>
+          <div class="feed-location-chip">📍 Wrightsville Beach, NC</div>
+          <div class="feed-product-chip">Bronze Primer</div>
+        </div>
+        <div class="feed-actions">
+          <div class="feed-action" onclick="likePost(this)"><span class="feed-action-icon">🔥</span> 24</div>
+          <div class="feed-action" onclick="showToast('❤️ Liked!')"><span class="feed-action-icon">❤️</span> 8</div>
+          <div class="feed-action" onclick="showToast('💬 Comments')"><span class="feed-action-icon">💬</span> 3</div>
+          <div class="feed-save" onclick="showToast('🔖 Saved!')">🔖</div>
+        </div>
+        <div class="feed-caption"><strong>Sophia</strong> Perfect beach day ☀️ The Bronze Primer is actually insane for getting an even tan</div>
+        <div class="feed-comments" onclick="showToast('💬 View comments')">View all 3 comments</div>
+      </div>
+      <!-- Post 2 -->
+      <div class="feed-card">
+        <div class="feed-card-header">
+          <div class="feed-avatar">🤙</div>
+          <div class="feed-user-info">
+            <div class="feed-username">Jake <span class="feed-uv-chip">UV 6</span></div>
+            <div class="feed-time">38 min ago</div>
+          </div>
+          <div class="feed-more">•••</div>
+        </div>
+        <div class="feed-image-bg" style="background: linear-gradient(180deg, #4CAF7D 0%, #2D7A50 100%)">
+          <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:60px">🌿</div>
+          <div class="feed-location-chip">📍 Lake Norman, NC</div>
+        </div>
+        <div class="feed-actions">
+          <div class="feed-action" onclick="likePost(this)"><span class="feed-action-icon">🔥</span> 41</div>
+          <div class="feed-action" onclick="showToast('❤️ Liked!')"><span class="feed-action-icon">❤️</span> 15</div>
+          <div class="feed-action" onclick="showToast('💬 Comments')"><span class="feed-action-icon">💬</span> 7</div>
+          <div class="feed-save" onclick="showToast('🔖 Saved!')">🔖</div>
+        </div>
+        <div class="feed-caption"><strong>Jake</strong> Day off = lake day 🙌 hitting session 3 this week, progress is real</div>
+        <div class="feed-comments" onclick="showToast('💬 View comments')">View all 7 comments</div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="switchTab('home')"><span class="nav-icon">☀️</span><span class="nav-label">Home</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('timer')"><span class="nav-icon">⏱️</span><span class="nav-label">Timer</span><div class="nav-dot"></div></div>
+      <div class="nav-item active" onclick="switchTab('tansnap')"><span class="nav-icon">📸</span><span class="nav-label">TanSnap</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span class="nav-label">Shop</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><div class="nav-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== SHOP ==================== -->
+  <div class="screen" id="shop">
+    <div class="shop-header">
+      <div class="shop-title">🛒 Tan Shop</div>
+      <div class="cart-btn" onclick="showToast('🛒 Cart (2 items)')">🛒<span class="badge">2</span></div>
+    </div>
+    <div class="pro-shop-banner">
+      <span class="pro-shop-icon">🎁</span>
+      <div>
+        <div class="pro-shop-text-title">Pro Members Save 20%</div>
+        <div class="pro-shop-text-sub">Get Pro for exclusive discounts, AI routines, and unlimited progress tracking.</div>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-chip active" onclick="setFilter(this)">All</div>
+      <div class="filter-chip" onclick="setFilter(this)">Pre-Tan</div>
+      <div class="filter-chip" onclick="setFilter(this)">After-Sun</div>
+      <div class="filter-chip" onclick="setFilter(this)">Protection</div>
+      <div class="filter-chip" onclick="setFilter(this)">Accessories</div>
+    </div>
+    <div class="product-list">
+      <div class="product-card">
+        <div class="product-img">🧴</div>
+        <div class="product-info">
+          <div class="product-name">Bronze Glow Pre-Tan Primer</div>
+          <div class="product-desc">Lightweight base with Vitamin E & coconut oil. Tan 2x faster with zero streaks.</div>
+          <div class="product-row">
+            <div class="product-price">$24.99</div>
+            <div class="product-stars">★★★★★</div>
+            <div class="product-reviews">(847)</div>
+            <div class="product-badge badge-bestseller">BEST SELLER</div>
+          </div>
+        </div>
+        <div class="add-btn" onclick="addToCart(this)">+</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">💧</div>
+        <div class="product-info">
+          <div class="product-name">After-Sun Glow Hydrator</div>
+          <div class="product-desc">Aloe + hyaluronic acid formula. Locks in color and keeps skin soft for days.</div>
+          <div class="product-row">
+            <div class="product-price">$19.99</div>
+            <div class="product-stars">★★★★★</div>
+            <div class="product-reviews">(623)</div>
+          </div>
+        </div>
+        <div class="add-btn" onclick="addToCart(this)">+</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">🌿</div>
+        <div class="product-info">
+          <div class="product-name">Skin Shield SPF 15 Mist</div>
+          <div class="product-desc">Light SPF that lets the tan through while blocking harmful rays. Non-greasy.</div>
+          <div class="product-row">
+            <div class="product-price">$17.99</div>
+            <div class="product-stars">★★★★☆</div>
+            <div class="product-reviews">(412)</div>
+            <div class="product-badge badge-new">NEW</div>
+          </div>
+        </div>
+        <div class="add-btn" onclick="addToCart(this)">+</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">✨</div>
+        <div class="product-info">
+          <div class="product-name">Golden Hour Tan Drops</div>
+          <div class="product-desc">Add to any moisturizer for a buildable glow. Perfect for maintaining color between sessions.</div>
+          <div class="product-row">
+            <div class="product-price">$29.99</div>
+            <div class="product-stars">★★★★★</div>
+            <div class="product-reviews">(389)</div>
+          </div>
+        </div>
+        <div class="add-btn" onclick="addToCart(this)">+</div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">🧊</div>
+        <div class="product-info">
+          <div class="product-name">Cooling Aloe Recovery Gel</div>
+          <div class="product-desc">Instant relief for overexposure. Menthol + aloe vera calms and repairs fast.</div>
+          <div class="product-row">
+            <div class="product-price">$14.99</div>
+            <div class="product-stars">★★★★★</div>
+            <div class="product-reviews">(298)</div>
+          </div>
+        </div>
+        <div class="add-btn" onclick="addToCart(this)">+</div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="switchTab('home')"><span class="nav-icon">☀️</span><span class="nav-label">Home</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('timer')"><span class="nav-icon">⏱️</span><span class="nav-label">Timer</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('tansnap')"><span class="nav-icon">📸</span><span class="nav-label">TanSnap</span><div class="nav-dot"></div></div>
+      <div class="nav-item active" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span class="nav-label">Shop</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><div class="nav-dot"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== PROFILE ==================== -->
+  <div class="screen" id="profile">
+    <div class="profile-screen-header">
+      <div class="profile-screen-title">Profile</div>
+      <div class="timer-settings" onclick="showToast('⚙️ Settings')">⚙️</div>
+    </div>
+    <div class="profile-top">
+      <div class="profile-avatar-ring">
+        <div class="profile-avatar-inner">😎</div>
+      </div>
+      <div class="profile-name">Cam</div>
+      <div class="profile-since">Member since Feb 2025</div>
+      <div class="plan-chip">FREE PLAN</div>
+    </div>
+    <div class="profile-stats-row">
+      <div class="profile-stat">
+        <div class="profile-stat-val">14</div>
+        <div class="profile-stat-label">Sessions</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val">85</div>
+        <div class="profile-stat-label">Tan Score</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val">7🔥</div>
+        <div class="profile-stat-label">Streak</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val">23</div>
+        <div class="profile-stat-label">Friends</div>
+      </div>
+    </div>
+    <div class="pro-upsell-card">
+      <div class="pro-upsell-header">
+        <span class="pro-upsell-icon">✨</span>
+        <span class="pro-upsell-name">Thryv Tan Pro</span>
+        <span class="pro-upsell-price" style="margin-left:auto">$5.99/month</span>
+      </div>
+      <div class="pro-upsell-features">
+        <div class="pro-upsell-feature"><span class="pro-upsell-check">✓</span> AI-powered personalized tan routines</div>
+        <div class="pro-upsell-feature"><span class="pro-upsell-check">✓</span> Smart flip alerts with sound & vibration</div>
+        <div class="pro-upsell-feature"><span class="pro-upsell-check">✓</span> Unlimited TanSnap posts & challenges</div>
+        <div class="pro-upsell-feature"><span class="pro-upsell-check">✓</span> Unlimited skin tone tracking & scans</div>
+        <div class="pro-upsell-feature"><span class="pro-upsell-check">✓</span> 20% off all Thryv Supps products</div>
+        <div class="pro-upsell-feature"><span class="pro-upsell-check">✓</span> Ad-free experience</div>
+      </div>
+      <button class="btn-primary" onclick="go('upsell')">Start 7-Day Free Trial</button>
+    </div>
+    <div class="profile-menu">
+      <div class="menu-section-label">My Tan</div>
+      <div class="menu-item" onclick="go('scanner')">
+        <span class="menu-item-icon">🔬</span>
+        <span class="menu-item-label">Skin Tone Scanner</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="switchTab('tansnap')">
+        <span class="menu-item-icon">📸</span>
+        <span class="menu-item-label">My TanSnaps</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showToast('📊 Skin Profile')">
+        <span class="menu-item-icon">🚀</span>
+        <span class="menu-item-label">Skin Profile</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showToast('📈 Progress')">
+        <span class="menu-item-icon">📊</span>
+        <span class="menu-item-label">Tan History & Progress</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-section-label">Social</div>
+      <div class="menu-item" onclick="showToast('👥 Friends (23)')">
+        <span class="menu-item-icon">👥</span>
+        <span class="menu-item-label">Friends (23)</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showToast('🎯 Tanning Goals')">
+        <span class="menu-item-icon">🎯</span>
+        <span class="menu-item-label">Tanning Goals</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-section-label">Account</div>
+      <div class="menu-item" onclick="showToast('🛍️ Order History')">
+        <span class="menu-item-icon">🛍️</span>
+        <span class="menu-item-label">Order History</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showToast('🔗 Referral link copied!')">
+        <span class="menu-item-icon">🔗</span>
+        <span class="menu-item-label">Invite Friends (Earn $5)</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="showToast('💬 Support')">
+        <span class="menu-item-icon">💬</span>
+        <span class="menu-item-label">Support</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+    </div>
+    <div class="menu-bottom-space"></div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="switchTab('home')"><span class="nav-icon">☀️</span><span class="nav-label">Home</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('timer')"><span class="nav-icon">⏱️</span><span class="nav-label">Timer</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('tansnap')"><span class="nav-icon">📸</span><span class="nav-label">TanSnap</span><div class="nav-dot"></div></div>
+      <div class="nav-item" onclick="switchTab('shop')"><span class="nav-icon">🛒</span><span class="nav-label">Shop</span><div class="nav-dot"></div></div>
+      <div class="nav-item active" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span class="nav-label">Profile</span><div class="nav-dot"></div></div>
+    </div>
+  </div>
+
+</div><!-- /phone-shell -->
+
+<script>
+// ===== NAVIGATION =====
+function go(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(screenId);
+  if (target) {
+    target.classList.add('active');
+    target.scrollTop = 0;
+  }
+}
+
+function switchTab(tab) {
+  go(tab);
+  // Update all nav bars
+  document.querySelectorAll('.nav-bar').forEach(nav => {
+    nav.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  });
+  // Map tab names to nav labels
+  const labels = { home: 'Home', timer: 'Timer', tansnap: 'TanSnap', shop: 'Shop', profile: 'Profile' };
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.querySelector('.nav-label').textContent === labels[tab]) {
+      item.classList.add('active');
+    }
+  });
+}
+
+// ===== QUIZ OPTIONS =====
+function selectOption(groupId, el, nextScreen) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(() => go(nextScreen), 350);
+}
+
+// ===== SKIN SCANNER =====
+let scanning = false;
+let scanPhase = 0;
+const directions = ['Look Left 👈', 'Look Center 👁️', 'Look Right 👉', ''];
+
+function startScan() {
+  if (scanning) return;
+  scanning = true;
+  const btn = document.getElementById('scanBtn');
+  const ring = document.getElementById('scanRing');
+  const line = document.getElementById('scanLine');
+  const instr = document.getElementById('scanInstruction');
+  const dir = document.getElementById('scanDirection');
+
+  btn.textContent = 'Scanning...';
+  btn.style.opacity = '0.6';
+  ring.classList.add('scanning');
+  line.classList.add('active');
+  scanPhase = 0;
+
+  function nextPhase() {
+    if (scanPhase < 3) {
+      dir.classList.add('show');
+      dir.textContent = directions[scanPhase];
+      scanPhase++;
+      if (scanPhase < 3) setTimeout(nextPhase, 1200);
+      else {
+        setTimeout(() => {
+          dir.classList.remove('show');
+          instr.innerHTML = '<em>Analyzing skin tone...</em>';
+          setTimeout(finishScan, 1500);
+        }, 1200);
+      }
+    }
+  }
+  setTimeout(nextPhase, 400);
+}
+
+function finishScan() {
+  document.getElementById('loading').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('show');
+    scanning = false;
+    go('tanProfile');
+  }, 2200);
+}
+
+// ===== TIMER =====
+let timerInterval = null;
+let timerRunning = false;
+let timerSeconds = 18 * 60;
+let totalSeconds = 18 * 60;
+let timerSideNum = 1;
+const circumference = 628;
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent = 
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const arc = document.getElementById('timerArc');
+  const progress = timerSeconds / totalSeconds;
+  arc.style.strokeDashoffset = circumference * (1 - progress);
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('playBtn');
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    btn.textContent = '▶';
+  } else {
+    timerRunning = true;
+    btn.textContent = '⏸';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        btn.textContent = '▶';
+        if (timerSideNum === 1) {
+          timerSideNum = 2;
+          document.getElementById('timerSide').textContent = 'Back Side';
+          timerSeconds = totalSeconds;
+          showToast('🔔 Flip over! Time for your back side.');
+        } else {
+          document.getElementById('timerSide').textContent = 'Session Complete!';
+          showToast('🎉 Tanning session complete!');
+        }
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSideNum = 1;
+  timerSeconds = totalSeconds;
+  document.getElementById('playBtn').textContent = '▶';
+  document.getElementById('timerSide').textContent = 'Front Side';
+  updateTimerDisplay();
+}
+
+function skipTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSideNum = 2;
+  timerSeconds = totalSeconds;
+  document.getElementById('playBtn').textContent = '▶';
+  document.getElementById('timerSide').textContent = 'Back Side';
+  updateTimerDisplay();
+  showToast('⏭ Skipped to Back Side');
+}
+
+function setTimerTime(val) {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  totalSeconds = parseInt(val) * 60;
+  timerSeconds = totalSeconds;
+  timerSideNum = 1;
+  document.getElementById('playBtn').textContent = '▶';
+  document.getElementById('timerSide').textContent = 'Front Side';
+  updateTimerDisplay();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== SHOP =====
+function setFilter(el) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+let cartCount = 2;
+function addToCart(btn) {
+  cartCount++;
+  btn.textContent = '✓';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; }, 1500);
+  showToast('🛒 Added to cart (' + cartCount + ')');
+}
+
+// ===== SOCIAL =====
+function likePost(el) {
+  const num = parseInt(el.textContent.replace('🔥','').trim()) + 1;
+  el.innerHTML = '<span class="feed-action-icon">🔥</span> ' + num;
+  el.style.color = 'var(--gold)';
+}
+
+// Init
+updateTimerDisplay();
+</script>
+</body>
+</html>
